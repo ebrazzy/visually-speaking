@@ -1,0 +1,113 @@
+/// SPHERE BASE AND VOLUME SPIKES
+
+float s = 0;
+float level;
+PFont font;
+
+Minim minim;
+AudioInput in;
+FFT fft;
+import ddf.minim.*;
+import ddf.minim.analysis.*;
+
+void setup () {  
+  size(displayWidth, displayHeight, P3D);
+  
+  minim = new Minim(this);
+  minim.debugOn();
+  
+  // get an audio input
+  in = minim.getLineIn(Minim.MONO, 4096, SR);
+  fft = new FFT(in.left.size(), SR);
+  
+  // hear what you're saying:
+  //in.enableMonitoring(); 
+ 
+  font = createFont("Wendy", 22);
+  textFont(font);   
+  
+  frameRate(200);
+}
+
+void draw () {
+  background(0);
+  translate(width/2, height/2); // Make the origin of the grid in the center.
+  
+  // find note function.
+  findNote();
+
+  
+  pushStyle();
+  //text(frequency-6+"hz", 50, 80); // display frequency in hz.
+  fill(r, g, b);
+  
+  smooth();
+  ellipseMode(CENTER);
+  ellipse(width/4, height/4, 10, 10); 
+  text("note is " + note, 12 + width/4, 5 + height/4); // display the name of the note below.
+  popStyle(); 
+  
+  int points = 360;
+  float radius = width/5;
+  float radius2 = width/5 + in.mix.level()*150; // get the buffer volume level for spikes
+  float radius3 = width/5;
+  
+      s = s + .005;
+      rotateX(s);
+      rotateZ(s);  
+      rotateY(s);
+      
+    
+   for (float a=0; a < points; a = a + 5) {
+    for (float b=0; b < points; b = b + 5) {        
+        
+    //for (float a = -180; a < 180; a = a + 2) {
+      //for (float b = -90; b < 90; b = b + 2) { 
+      
+      float x = cos(a) * sin(b) * radius;
+      float y = sin(a) * sin(b) * radius;
+      float z = cos(b) * radius;
+      
+      smooth();
+      stroke(r, g, b);
+      strokeWeight(5);
+      point(x, y, z);  
+    
+      float x2 = cos(a) * sin(b) * radius2;
+      float y2 = sin(a) * sin(b) * radius2;
+      float z2 = cos(b) * radius2;
+      
+       strokeWeight(2);
+       stroke(r, g, b);
+       line(x, y, z, x2, y2, z2); 
+       
+      float x3 = cos(a) * sin(b) * radius3;
+      float y3 = sin(a) * sin(b) * radius3;
+      float z3 = cos(b) * radius3;
+      
+      strokeWeight(1);
+      stroke(fR, fG, fB, 100);
+      line(0, 0, 0, x3/1.3, y3/1.3, z3/1.3);        
+}
+ }
+ 
+    pushStyle();
+    smooth();
+    noStroke();
+    fill(fR, fG, fB, 175);
+    sphere(radius);
+    popStyle();
+    
+  } 
+  
+ 
+ 
+ 
+// close minim audio.
+void stop()
+{
+  in.close();
+  minim.stop();
+  super.stop();
+}
+
